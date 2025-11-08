@@ -15,6 +15,7 @@ class Project extends Model
         'priority',
         'type',
         'recurring',
+        'budget',
         'created_by'
     ];
 }

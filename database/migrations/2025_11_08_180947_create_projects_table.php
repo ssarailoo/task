@@ -25,7 +25,8 @@ return new class extends Migration {
             $table->enum("priority", ProjectPriorityEnum::getValues())->default(ProjectPriorityEnum::LOW->value);
             $table->enum("type", ProjectTypeEnum::getValues())->default(ProjectTypeEnum::INTERNAL->value);
             $table->enum("recurring", ProjectRecurringEnum::getValues())->default(ProjectRecurringEnum::NONE->value);
-            $table->foreignIdFor(User::class, 'created_by')->constrained()->restrictOnDelete();;
+            $table->decimal("budget", 15, 2)->default(0);
+            $table->foreignIdFor(User::class, 'created_by')->constrained()->restrictOnDelete();
             $table->timestamps();
         });
     }
