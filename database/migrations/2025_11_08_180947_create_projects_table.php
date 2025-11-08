@@ -1,6 +1,9 @@
 <?php
 
+use App\Enums\ProjectPriorityEnum;
+use App\Enums\ProjectRecurringEnum;
 use App\Enums\ProjectStatusEnum;
+use App\Enums\ProjectTypeEnum;
 use App\Models\User;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -19,9 +22,9 @@ return new class extends Migration {
             $table->date('start_date');
             $table->date('end_date');
             $table->enum("status", ProjectStatusEnum::getValues())->default(ProjectStatusEnum::PENDING->value);
-            $table->enum("priority", ['low', 'medium', 'high'])->default('low');
-            $table->enum("type", ['internal', 'external'])->default('internal');
-            $table->enum("recurring", ['none', 'weekly', 'monthly', 'yearly'])->default('none');
+            $table->enum("priority", ProjectPriorityEnum::getValues())->default(ProjectPriorityEnum::LOW->value);
+            $table->enum("type", ProjectTypeEnum::getValues())->default(ProjectTypeEnum::INTERNAL->value);
+            $table->enum("recurring", ProjectRecurringEnum::getValues())->default(ProjectRecurringEnum::NONE->value);
             $table->foreignIdFor(User::class, 'created_by')->constrained()->restrictOnDelete();;
             $table->timestamps();
         });
