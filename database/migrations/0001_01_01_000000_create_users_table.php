@@ -17,6 +17,11 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->enum('role',['expert','supervisor','manager'])->default('expert');
+            $table->string('avatar')->nullable();
+            $table->timestamp('last_login')->nullable();
+            $table->json('preferences')->nullable();
+            $table->json('skills')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });
