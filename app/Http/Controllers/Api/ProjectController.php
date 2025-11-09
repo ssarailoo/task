@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\DataTransferObjects\ProjectDTO;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\IndexProjectRequest;
 use App\Http\Requests\StoreProjectRequest;
@@ -37,10 +38,13 @@ class ProjectController extends Controller
     public function store(StoreProjectRequest $request): JsonResponse
     {
         try {
-            $project = $this->projectService->createProject($request->validated());
+            $data = ProjectDTO::fromRequest($request->validated());
+            $project = $this->projectService->createProject($data);
+
             return response()->json(['data' => new ProjectResource($project)], Response::HTTP_CREATED);
         } catch (\Exception $e) {
             //TODO: add metrics and logs
+
             return response()->json([
                 'error' => config('app.debug') ? $e->getMessage() : null
             ], Response::HTTP_INTERNAL_SERVER_ERROR);

@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\DataTransferObjects\ProjectDTO;
 use App\Enums\ProjectPriorityEnum;
 use App\Enums\ProjectRecurringEnum;
 use App\Enums\ProjectStatusEnum;
@@ -51,34 +52,18 @@ use Illuminate\Support\Facades\DB;
         return $projects->paginate($filters['per_page'] ?? 15);
     }
 
-    public function createProject(array $data): Project
+    public function createProject(ProjectDTO $data): Project
     {
         return DB::transaction(function () use ($data) {
-            $project = $this->query()->create($this->prepareProjectData($data));
-
+            $project = $this->query()->create($data->toArray());
             $this->handleAttachments($project, $data);
 
             return $project->load('attachments');
         });
     }
 
-    private function prepareProjectData(array $data): array
-    {
-        return [
-            'title' => $data['title'],
-            'description' => $data['description'],
-            'start_date' => $data['start_date'],
-            'end_date' => $data['end_date'],
-            'status' => $data['status'] ?? ProjectStatusEnum::PENDING->value,
-            'priority' => $data['priority'] ?? ProjectPriorityEnum::LOW->value,
-            'type' => $data['type'] ?? ProjectTypeEnum::INTERNAL->value,
-            'recurring' => $data['recurring'] ?? ProjectRecurringEnum::NONE->value,
-            'budget' => $data['budget'] ?? 0,
-            'created_by' => $data['created_by'] ?? 1, // TODO: auth()->id()
-        ];
-    }
 
-    private function handleAttachments(Project $project, array $data): void
+    private function handleAttachments(Project $project, ProjectDTO $data): void
     {
         if (empty($data['attachments'])) {
             return;
