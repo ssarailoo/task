@@ -22,7 +22,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Facades\DB;
 
-class ProjectService
+ readonly class ProjectService
 {
     public function __construct(
         private readonly AttachmentService $attachmentService
