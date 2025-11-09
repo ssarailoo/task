@@ -38,4 +38,23 @@ class Task extends Model
     {
         return $this->belongsToMany(Tag::class, 'task_tag')->withTimestamps();
     }
+    public function dependencies(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            Task::class,
+            'task_dependencies',
+            'task_id',
+            'depends_on_task_id'
+        )->withTimestamps();
+    }
+
+    public function dependents(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            Task::class,
+            'task_dependencies',
+            'depends_on_task_id',
+            'task_id'
+        )->withTimestamps();
+    }
 }
