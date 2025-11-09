@@ -18,7 +18,7 @@ class ProjectController extends Controller
 
     public function index(IndexProjectRequest $request): JsonResponse
     {
-        $projects = $this->projectService->getAllProjects($request->validated());
+        $projects = $this->projectService->getProjects($request->validated());
 
         return response()->json([
             'data' => ProjectResource::collection($projects),

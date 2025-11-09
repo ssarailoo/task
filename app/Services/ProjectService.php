@@ -19,7 +19,7 @@ use Illuminate\Pipeline\Pipeline;
 
 class ProjectService
 {
-    public function getAllProjects(array $filters): LengthAwarePaginator
+    public function getProjects(array $filters): LengthAwarePaginator
     {
         $query = $this->query();
 
