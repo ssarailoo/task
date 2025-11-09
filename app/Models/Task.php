@@ -34,4 +34,8 @@ class Task extends Model
         return $this->belongsToMany(User::class, 'task_user')
             ->withTimestamps();
     }
+    public function tags(): BelongsToMany
+    {
+        return $this->belongsToMany(Tag::class, 'task_tag')->withTimestamps();
+    }
 }
