@@ -11,21 +11,17 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void
+        public function up(): void
     {
         Schema::create('tasks', function (Blueprint $table) {
             $table->id();
-            Schema::create('tasks', function (Blueprint $table) {
-                $table->id();
-                $table->string('title');
-                $table->text('description')->nullable();
-                $table->foreignIdFor(Project::class)->constrained()->cascadeOnDelete();
-                $table->enum('status', TaskStatusEnum::getValues())->default(TaskStatusEnum::TODO->value);
-                $table->date('due_date')->nullable();
-                $table->unsignedInteger('estimated_time')->nullable()->comment('in minutes');
-                $table->unsignedInteger('actual_time')->nullable()->comment('in minutes');
-                $table->timestamps();
-            });
+            $table->string('title');
+            $table->text('description')->nullable();
+            $table->foreignIdFor(Project::class)->constrained()->cascadeOnDelete();
+            $table->enum('status', TaskStatusEnum::getValues())->default(TaskStatusEnum::TODO->value);
+            $table->date('due_date')->nullable();
+            $table->unsignedInteger('estimated_time')->nullable()->comment('in minutes');
+            $table->unsignedInteger('actual_time')->nullable()->comment('in minutes');
             $table->timestamps();
         });
     }
