@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\IndexProjectRequest;
 use App\Http\Resources\ProjectResource;
 use App\Services\ProjectService;
 use Illuminate\Http\JsonResponse;
@@ -15,12 +16,11 @@ class ProjectController extends Controller
         private readonly ProjectService $projectService
     ) {}
 
-    public function index(Request $request): JsonResponse
+    public function index(IndexProjectRequest $request): JsonResponse
     {
-        $projects = $this->projectService->getAllProjects($request->all());
+        $projects = $this->projectService->getAllProjects($request->validated());
 
         return response()->json([
-            'success' => true,
             'data' => ProjectResource::collection($projects),
             'meta' => [
                 'current_page' => $projects->currentPage(),
