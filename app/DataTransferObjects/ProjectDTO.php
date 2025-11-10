@@ -20,6 +20,7 @@ readonly class ProjectDTO extends BaseDTO
         public ProjectRecurringEnum $recurring,
         public float $budget,
         public int $created_by,
+        public array $user_ids,
         public ?array $attachments = null,
     ) {}
 
@@ -44,7 +45,17 @@ readonly class ProjectDTO extends BaseDTO
                 : ProjectRecurringEnum::NONE,
             budget: $data['budget'] ?? 0,
             created_by: $data['created_by'] ?? 1, // TODO: auth()->id()
+            user_ids: $data['user_ids'],
             attachments: $data['attachments'] ?? null,
         );
+    }
+
+    public function toArray(): array
+    {
+        $data = parent::toArray();
+
+        unset($data['user_ids']);
+
+        return $data;
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Enums\TaskStatusEnum;
+use App\Rules\UserBelongsToProject;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -26,8 +27,12 @@ class UpdateTaskRequest extends FormRequest
             'due_date' => ['nullable', 'date'],
             'estimated_time' => ['nullable', 'integer', 'min:0'],
             'actual_time' => ['nullable', 'integer', 'min:0'],
-            'assigned_users' => ['nullable', 'array'],
-            'assigned_users.*' => ['integer', 'exists:users,id'],
+            'assigned_user_ids' => ['nullable', 'array'],
+            'assigned_user_ids.*' => [
+                'integer',
+                'exists:users,id',
+                new UserBelongsToProject($this->input('project_id'))
+            ],
             'dependencies' => ['nullable', 'array'],
             'dependencies.*' => ['integer', 'exists:tasks,id'],
         ];

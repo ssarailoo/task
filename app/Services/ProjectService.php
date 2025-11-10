@@ -3,10 +3,6 @@
 namespace App\Services;
 
 use App\DataTransferObjects\ProjectDTO;
-use App\Enums\ProjectPriorityEnum;
-use App\Enums\ProjectRecurringEnum;
-use App\Enums\ProjectStatusEnum;
-use App\Enums\ProjectTypeEnum;
 use App\Models\Project;
 use App\QueryFilters\Project\BudgetMaxFilter;
 use App\QueryFilters\Project\BudgetMinFilter;
@@ -23,7 +19,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Facades\DB;
 
- readonly class ProjectService
+readonly class ProjectService
 {
     public function __construct(
         private readonly AttachmentService $attachmentService
@@ -56,12 +52,13 @@ use Illuminate\Support\Facades\DB;
     {
         return DB::transaction(function () use ($data) {
             $project = $this->query()->create($data->toArray());
-            $this->handleAttachments($project, $data);
 
-            return $project->load('attachments');
+            $this->handleAttachments($project, $data);
+            $this->handleUsers($project, $data);
+
+            return $project->load(['attachments', 'users']);
         });
     }
-
 
     private function handleAttachments(Project $project, ProjectDTO $data): void
     {
@@ -71,6 +68,16 @@ use Illuminate\Support\Facades\DB;
 
         $this->attachmentService->storeAttachments($project, $data->attachments);
     }
+
+    private function handleUsers(Project $project, ProjectDTO $data): void
+    {
+        if (empty($data->user_ids)) {
+            return;
+        }
+
+        $project->users()->attach($data->user_ids);
+    }
+
     private function query(): Builder
     {
         return Project::query();
