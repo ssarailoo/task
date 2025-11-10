@@ -14,7 +14,7 @@ readonly class TaskDTO extends BaseDTO
         public ?string $due_date,
         public ?int $estimated_time,
         public ?int $actual_time,
-        public ?array $assigned_users = null,
+        public array $assigned_users ,
         public ?array $dependencies = null,
     ) {}
 

@@ -27,7 +27,7 @@ class StoreTaskRequest extends FormRequest
             'due_date' => ['nullable', 'date'],
             'estimated_time' => ['nullable', 'integer', 'min:0'],
             'actual_time' => ['nullable', 'integer', 'min:0'],
-            'assigned_user_ids' => ['required', 'array'],
+            'assigned_user_ids' => ['nullable', 'array'],
             'assigned_user_ids.*' => [
                 'integer',
                 'exists:users,id',
