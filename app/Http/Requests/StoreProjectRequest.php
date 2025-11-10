@@ -31,6 +31,17 @@ class StoreProjectRequest extends FormRequest
             'created_by' => ['sometimes', 'integer', 'exists:users,id'], // TODO: Remove and use auth()->id()
             'attachments' => ['nullable', 'array'],
             'attachments.*' => ['file', 'mimes:pdf,doc,docx,jpg,jpeg,png', 'max:10240'],
+            'user_ids' => ['required', 'array', 'min:1'],
+            'user_ids.*' => ['integer', 'exists:users,id', 'distinct'],
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'user_ids.required' => 'At least one user must be assigned to the project.',
+            'user_ids.min' => 'At least one user must be assigned to the project.',
+            'user_ids.*.distinct' => 'Duplicate user IDs are not allowed.',
         ];
     }
 }
