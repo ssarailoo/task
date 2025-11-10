@@ -18,8 +18,14 @@ class TaskResource extends JsonResource
             'due_date' => $this->due_date,
             'estimated_time' => $this->estimated_time,
             'actual_time' => $this->actual_time,
-            'assigned_users' => $this->assignedUsers->pluck('id'),
-            'dependencies' => $this->dependencies->pluck('id'),
+
+            //TODO : add tag resource
+            'project' => new ProjectResource($this->whenLoaded('project')),
+            'assigned_users' => UserResource::collection($this->whenLoaded('assignedUsers')),
+            'dependencies' => TaskResource::collection($this->whenLoaded('dependencies')),
+            'dependents' => TaskResource::collection($this->whenLoaded('dependents')),
+            'comments' => CommentResource::collection($this->whenLoaded('comments')),
+
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];
