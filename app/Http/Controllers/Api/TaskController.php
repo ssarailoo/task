@@ -35,7 +35,19 @@ class TaskController extends Controller
     }
     public function show(Task $task): JsonResponse
     {
-        return response()->json(['data' => new TaskResource($task->load(['project', 'assignedUsers', 'dependencies']))], Response::HTTP_OK);
+        return response()->json([
+            'data' => new TaskResource(
+                $task->load([
+                    'project',
+                    'assignedUsers',
+                    'tags',
+                    'dependencies',
+                    'dependents',
+                    'comments.user',
+                    'comments.replies'
+                ])
+            )
+        ], Response::HTTP_OK);
     }
 
     public function store(StoreTaskRequest $request): JsonResponse
