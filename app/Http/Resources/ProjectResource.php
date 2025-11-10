@@ -21,8 +21,16 @@ class ProjectResource extends JsonResource
             'recurring' => $this->recurring,
             'budget' => $this->budget,
             'created_by' => $this->created_by,
+
+            'attachments' => AttachmentResource::collection($this->whenLoaded('attachments')),
+            'users' => UserResource::collection($this->whenLoaded('users')),
+            'tasks' => TaskResource::collection($this->whenLoaded('tasks')),
+            'reports' => ReportResource::collection($this->whenLoaded('reports')),
+
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
+
+
         ];
     }
 }
