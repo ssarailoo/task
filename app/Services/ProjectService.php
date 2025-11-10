@@ -65,11 +65,11 @@ use Illuminate\Support\Facades\DB;
 
     private function handleAttachments(Project $project, ProjectDTO $data): void
     {
-        if (empty($projectData->attachments)) {
+        if (empty($data->attachments)) {
             return;
         }
 
-        $this->attachmentService->storeAttachments($project, $projectData->attachments);
+        $this->attachmentService->storeAttachments($project, $data->attachments);
     }
     private function query(): Builder
     {
