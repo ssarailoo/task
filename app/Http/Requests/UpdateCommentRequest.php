@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Rules\NoRatingForReplies;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateCommentRequest extends FormRequest
@@ -14,21 +15,11 @@ class UpdateCommentRequest extends FormRequest
 
     public function rules(): array
     {
+        $comment = $this->route('comment');
+        $parentId = $comment?->parent_id;
         return [
             'content' => ['required', 'string', 'max:5000'],
-            'rating' => ['nullable', 'integer', 'min:1', 'max:5'],
+            'rating' => ['nullable', 'integer', 'min:1', 'max:5', new NoRatingForReplies($parentId)],
         ];
-    }
-
-    public function withValidator($validator): void
-    {
-        //TODO : add custom rule
-        $validator->after(function ($validator) {
-            $isReply = $this->route('comment') !== null;
-            $hasRating = $this->filled('rating');
-            if ($isReply && $hasRating) {
-                $validator->errors()->add('rating', 'Replies cannot have ratings.');
-            }
-        });
     }
 }
