@@ -12,7 +12,7 @@ class Comment extends Model
         'task_id',
         'user_id',
         'parent_id',
-        'comment',
+        'content',
         'rating',
     ];
 
