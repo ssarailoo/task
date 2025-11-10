@@ -23,6 +23,7 @@ return new class extends Migration
             $table->timestamp('last_login')->nullable();
             $table->json('preferences')->nullable();
             $table->json('skills')->nullable();
+            $table->string('google_id')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });
