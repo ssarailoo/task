@@ -28,7 +28,6 @@ class StoreProjectRequest extends FormRequest
             'type' => ['sometimes', Rule::in(ProjectTypeEnum::getValues())],
             'recurring' => ['sometimes', Rule::in(ProjectRecurringEnum::getValues())],
             'budget' => ['sometimes', 'numeric', 'min:0', 'max:999999999999.99'],
-            'created_by' => ['sometimes', 'integer', 'exists:users,id'], // TODO: Remove and use auth()->id()
             'attachments' => ['nullable', 'array'],
             'attachments.*' => ['file', 'mimes:pdf,doc,docx,jpg,jpeg,png', 'max:10240'],
             'user_ids' => ['required', 'array', 'min:1'],
