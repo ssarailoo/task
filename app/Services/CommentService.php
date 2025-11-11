@@ -24,9 +24,10 @@ readonly class CommentService
         return $this->query()->create($replyData);
     }
 
-    public function updateComment(Comment $comment, array $data): Comment
+    public function updateComment(Comment $comment, CommentDTO $data): Comment
     {
-        $comment->update($data);
+        $updateData = array_filter($data->toArray(), fn($v) => $v !== null);
+        $comment->update($updateData);
         return $comment->fresh();
     }
 
