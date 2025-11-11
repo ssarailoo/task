@@ -9,6 +9,8 @@ use App\Enums\ProjectTypeEnum;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Laravel\Passport\Passport;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Component\HttpFoundation\Response;
@@ -26,7 +28,7 @@ class ProjectTest extends TestCase
         $this->user = User::factory()->create();
     }
 
-   #[Test]
+    #[Test]
     public function it_can_create_a_project_with_minimal_data()
     {
         Passport::actingAs($this->user);
@@ -64,6 +66,7 @@ class ProjectTest extends TestCase
             'user_id' => $this->user->id,
         ]);
     }
+
     #[Test]
     public function it_can_create_a_project_with_all_data(): void
     {
@@ -109,5 +112,38 @@ class ProjectTest extends TestCase
             'user_id' => $this->user->id,
         ]);
     }
+
+    #[Test]
+    public function it_can_create_a_project_with_attachments()
+    {
+        Storage::fake('public');
+        Passport::actingAs($this->user);
+
+        $file = UploadedFile::fake()->create('document.pdf', 1000);
+
+        $projectData = [
+            'title' => 'Project with Attachment',
+            'description' => 'Project with attachment description',
+            'start_date' => now()->addDay()->toDateString(),
+            'end_date' => now()->addDays(30)->toDateString(),
+            'user_ids' => [$this->user->id],
+            'attachments' => [$file],
+        ];
+
+        $response = $this->postJson('/api/v1/projects', $projectData);
+        $response->assertStatus(Response::HTTP_CREATED);
+
+        $projectId = $response->json('data.id');
+
+        $this->assertDatabaseHas('attachments', [
+            'file_name' => $file->getClientOriginalName(),
+            'attachable_type' => get_class(app(\App\Models\Project::class)),
+            'attachable_id' => $projectId,
+        ]);
+
+        $expectedPath = "attachments/Project/{$projectId}/{$file->hashName()}";
+        Storage::disk('public')->assertExists($expectedPath);
+    }
+
 
 }
