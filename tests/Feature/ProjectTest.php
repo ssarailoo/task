@@ -297,4 +297,19 @@ class ProjectTest extends TestCase
 
 
 
+    #[Test]
+    public function unauthenticated_user_cannot_create_project()
+    {
+        $projectData = [
+            'title' => 'Test Project',
+            'description' => 'Test description',
+            'start_date' => now()->addDay()->toDateString(),
+            'end_date' => now()->addDays(30)->toDateString(),
+            'user_ids' => [$this->user->id],
+        ];
+
+        $response = $this->postJson('/api/v1/projects', $projectData);
+
+        $response->assertStatus(401);
+    }
 }
