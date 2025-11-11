@@ -3,6 +3,8 @@
 namespace App\Services;
 
 use App\DataTransferObjects\TaskDTO;
+use App\Enums\TaskStatusEnum;
+use App\Events\TaskCompleted;
 use App\Models\Task;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -35,6 +37,9 @@ readonly class TaskService
     public function updateTask(Task $task, TaskDTO $data): Task
     {
         return DB::transaction(function () use ($task, $data) {
+            $wasCompleted = $task->status === TaskStatusEnum::COMPLETED->value;
+            $isNowCompleted = $data->status === TaskStatusEnum::COMPLETED;
+
             $task->update($data->toArray());
 
             if ($data->assigned_users !== null) {
@@ -45,6 +50,9 @@ readonly class TaskService
                 $task->dependencies()->sync($data->dependencies);
             }
 
+            if (!$wasCompleted && $isNowCompleted) {
+                event(new TaskCompleted($task));
+            }
             return $task->fresh(['project', 'assignedUsers', 'dependencies']);
         });
     }
