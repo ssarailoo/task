@@ -42,6 +42,7 @@ class CommentController extends Controller
 
     public function update(UpdateCommentRequest $request, Comment $comment): JsonResponse
     {
+        $this->authorize('update', $comment);
         $comment = $this->commentService->updateComment($comment, $request->validated());
 
         return response()->json(
@@ -52,6 +53,7 @@ class CommentController extends Controller
 
     public function destroy(Comment $comment): JsonResponse
     {
+        $this->authorize('delete', $comment);
         $this->commentService->deleteComment($comment);
 
         return response()->json(null, Response::HTTP_NO_CONTENT);

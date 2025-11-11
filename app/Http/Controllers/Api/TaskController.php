@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\DataTransferObjects\TaskDTO;
+use App\Enums\TaskStatusEnum;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreTaskRequest;
 use App\Http\Requests\UpdateTaskRequest;
@@ -60,6 +61,12 @@ class TaskController extends Controller
 
     public function update(UpdateTaskRequest $request, Task $task): JsonResponse
     {
+        $this->authorize('update', $task);
+
+        if ($request->input('status') === TaskStatusEnum::COMPLETED->value) {
+            $this->authorize('markAsCompleted', $task);
+        }
+
         $taskData = TaskDTO::fromRequest($request->validated());
         $task = $this->taskService->updateTask($task, $taskData);
 
