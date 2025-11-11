@@ -16,7 +16,7 @@ readonly class CommentDTO extends BaseDTO
     {
         return new self(
             task_id: $data['task_id'],
-            user_id: $data['user_id'] ?? 1, // TODO: auth()->id()
+            user_id: auth()->id(),
             content: $data['content'],
             parent_id: $data['parent_id'] ?? null,
             rating: $data['rating'] ?? null,
