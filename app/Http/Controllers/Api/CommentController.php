@@ -43,7 +43,8 @@ class CommentController extends Controller
     public function update(UpdateCommentRequest $request, Comment $comment): JsonResponse
     {
         $this->authorize('update', $comment);
-        $comment = $this->commentService->updateComment($comment, $request->validated());
+        $data = CommentDTO::fromRequest($request->validated());
+        $comment = $this->commentService->updateComment($comment, $data);
 
         return response()->json(
             ['data' => new CommentResource($comment)],
