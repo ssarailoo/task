@@ -2,11 +2,13 @@
 
 namespace Tests\Feature;
 
+use App\DataTransferObjects\ProjectDTO;
 use App\Enums\ProjectPriorityEnum;
 use App\Enums\ProjectRecurringEnum;
 use App\Enums\ProjectStatusEnum;
 use App\Enums\ProjectTypeEnum;
 use App\Models\User;
+use App\Services\ProjectService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Http\UploadedFile;
@@ -221,6 +223,78 @@ class ProjectTest extends TestCase
         $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY)
             ->assertJsonValidationErrors(['end_date']);
     }
+
+    #[Test]
+    public function it_can_filter_projects_by_status()
+    {
+        Passport::actingAs($this->user);
+
+
+        $service = app(ProjectService::class);
+
+        $service->createProject(ProjectDTO::fromRequest([
+            'title' => 'Pending Project',
+            'description' => 'Pending project description',
+            'start_date' => now()->addDay()->toDateString(),
+            'end_date' => now()->addDays(30)->toDateString(),
+            'status' => ProjectStatusEnum::PENDING->value,
+            'user_ids' => [$this->user->id],
+        ]));
+
+        $service->createProject(ProjectDTO::fromRequest([
+            'title' => 'In Progress Project',
+            'description' => 'In Progress project description',
+            'start_date' => now()->addDay()->toDateString(),
+            'end_date' => now()->addDays(30)->toDateString(),
+            'status' => ProjectStatusEnum::IN_PROGRESS->value,
+            'user_ids' => [$this->user->id],
+        ]));
+
+        $response = $this->getJson('/api/v1/projects?status=' . ProjectStatusEnum::PENDING->value);
+
+        $response->assertStatus(Response::HTTP_OK);
+
+        $projects = $response->json('data');
+        $this->assertNotEmpty($projects);
+
+        foreach ($projects as $project) {
+            $this->assertEquals(ProjectStatusEnum::PENDING->value, $project['status']);
+        }
+    }
+
+
+    #[Test]
+    public function it_can_search_projects()
+    {
+        Passport::actingAs($this->user);
+
+        $service = app(ProjectService::class);
+
+        $service->createProject(ProjectDTO::fromRequest([
+            'title' => 'Laravel Development',
+            'description' => 'Some description',
+            'start_date' => now()->addDay()->toDateString(),
+            'end_date' => now()->addDays(30)->toDateString(),
+            'user_ids' => [$this->user->id],
+        ]));
+
+        $service->createProject(ProjectDTO::fromRequest([
+            'title' => 'React Frontend',
+            'description' => 'Some description',
+            'start_date' => now()->addDay()->toDateString(),
+            'end_date' => now()->addDays(30)->toDateString(),
+            'user_ids' => [$this->user->id],
+        ]));
+
+        $response = $this->getJson('/api/v1/projects?search=Laravel');
+
+        $response->assertStatus(200);
+
+        $projects = $response->json('data');
+        $this->assertNotEmpty($projects);
+        $this->assertStringContainsString('Laravel', $projects[0]['title']);
+    }
+
 
 
 }
