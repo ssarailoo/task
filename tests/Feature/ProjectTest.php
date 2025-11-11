@@ -145,5 +145,82 @@ class ProjectTest extends TestCase
         Storage::disk('public')->assertExists($expectedPath);
     }
 
+    #[Test]
+    public function it_requires_title_to_create_project()
+    {
+        Passport::actingAs($this->user);
+
+        $projectData = [
+            'description' => 'Test description',
+            'start_date' => now()->addDay()->toDateString(),
+            'end_date' => now()->addDays(30)->toDateString(),
+            'user_ids' => [$this->user->id],
+        ];
+
+        $response = $this->postJson('/api/v1/projects', $projectData);
+
+        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY)
+            ->assertJsonValidationErrors(['title']);
+
+    }
+    #[Test]
+    public function it_requires_at_least_one_user()
+    {
+        Passport::actingAs($this->user);
+
+        $projectData = [
+            'title' => 'Test Project',
+            'description' => 'Test description',
+            'start_date' => now()->addDay()->toDateString(),
+            'end_date' => now()->addDays(30)->toDateString(),
+            'user_ids' => [],
+        ];
+
+        $response = $this->postJson('/api/v1/projects', $projectData);
+
+        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY)
+            ->assertJsonValidationErrors(['user_ids']);
+    }
+
+
+    #[Test]
+    public function it_validates_start_date_is_not_in_past()
+    {
+        Passport::actingAs($this->user);
+
+        $projectData = [
+            'title' => 'Test Project',
+            'description' => 'Test description',
+            'start_date' => now()->subDay()->toDateString(),
+            'end_date' => now()->addDays(30)->toDateString(),
+            'user_ids' => [$this->user->id],
+        ];
+
+        $response = $this->postJson('/api/v1/projects', $projectData);
+
+        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY)
+            ->assertJsonValidationErrors(['start_date']);
+    }
+
+
+    #[Test]
+    public function it_validates_end_date_is_after_start_date()
+    {
+        Passport::actingAs($this->user);
+
+        $projectData = [
+            'title' => 'Test Project',
+            'description' => 'Test description',
+            'start_date' => now()->addDays(30)->toDateString(),
+            'end_date' => now()->addDay()->toDateString(),
+            'user_ids' => [$this->user->id],
+        ];
+
+        $response = $this->postJson('/api/v1/projects', $projectData);
+
+        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY)
+            ->assertJsonValidationErrors(['end_date']);
+    }
+
 
 }
