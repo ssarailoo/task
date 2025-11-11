@@ -3,6 +3,8 @@
 namespace App\Services;
 
 use App\DataTransferObjects\TaskDTO;
+use App\DataTransferObjects\UpdatedTaskDTO;
+use App\DataTransferObjects\UpdateTaskDTO;
 use App\Enums\TaskStatusEnum;
 use App\Events\TaskCompleted;
 use App\Models\Task;
@@ -22,8 +24,8 @@ readonly class TaskService
         return DB::transaction(function () use ($data) {
             $task = $this->query()->create($data->toArray());
 
-            if ($data->assigned_users) {
-                $task->assignedUsers()->sync($data->assigned_users);
+            if ($data->assigned_user_ids) {
+                $task->assignedUsers()->sync($data->assigned_user_ids);
             }
 
             if ($data->dependencies) {
@@ -34,16 +36,17 @@ readonly class TaskService
         });
     }
 
-    public function updateTask(Task $task, TaskDTO $data): Task
+    public function updateTask(Task $task, UpdatedTaskDTO $data): Task
     {
         return DB::transaction(function () use ($task, $data) {
             $wasCompleted = $task->status === TaskStatusEnum::COMPLETED->value;
             $isNowCompleted = $data->status === TaskStatusEnum::COMPLETED;
 
-            $task->update($data->toArray());
+            $updateData = array_filter($data->toArray(), fn($value) => $value !== null);
+            $task->update($updateData);
 
-            if ($data->assigned_users !== null) {
-                $task->assignedUsers()->sync($data->assigned_users);
+            if ($data->assigned_user_ids !== null) {
+                $task->assignedUsers()->sync($data->assigned_user_ids);
             }
 
             if ($data->dependencies !== null) {

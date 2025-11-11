@@ -310,6 +310,6 @@ class ProjectTest extends TestCase
 
         $response = $this->postJson('/api/v1/projects', $projectData);
 
-        $response->assertStatus(401);
+        $response->assertStatus(Response::HTTP_UNAUTHORIZED);
     }
 }
