@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\DataTransferObjects\TaskDTO;
+use App\DataTransferObjects\UpdatedTaskDTO;
 use App\Enums\TaskStatusEnum;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreTaskRequest;
@@ -67,7 +68,7 @@ class TaskController extends Controller
             $this->authorize('markAsCompleted', $task);
         }
 
-        $taskData = TaskDTO::fromRequest($request->validated());
+        $taskData = UpdatedTaskDTO::fromRequest($request->validated());
         $task = $this->taskService->updateTask($task, $taskData);
 
         return response()->json(['data' => new TaskResource($task)], Response::HTTP_OK);
