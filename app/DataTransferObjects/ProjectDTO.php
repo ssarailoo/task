@@ -44,7 +44,7 @@ readonly class ProjectDTO extends BaseDTO
                 ? ProjectRecurringEnum::from($data['recurring'])
                 : ProjectRecurringEnum::NONE,
             budget: $data['budget'] ?? 0,
-            created_by: auth()->id,
+            created_by: auth()->id(),
             user_ids: $data['user_ids'],
             attachments: $data['attachments'] ?? null,
         );
