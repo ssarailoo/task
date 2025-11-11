@@ -2,7 +2,15 @@
 
 namespace App\Providers;
 
+use App\Events\TaskCompleted;
+use App\Models\Comment;
+use App\Models\Task;
+use App\Policies\CommentPolicy;
+use App\Policies\TaskPolicy;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
+use Laravel\Passport\Passport;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -19,6 +27,15 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        Passport::tokensExpireIn(now()->addDays(15));
+        Passport::refreshTokensExpireIn(now()->addDays(30));
+        Passport::personalAccessTokensExpireIn(now()->addMonths(6));
+        Gate::policy(Task::class, TaskPolicy::class);
+        Gate::policy(Comment::class, CommentPolicy::class);
+
+        Event::listen([
+            TaskCompleted::class,
+        ]);
+
     }
 }
